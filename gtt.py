@@ -148,6 +148,30 @@ if not today_df.empty:
 
     st.markdown("---")
 
+# ---------- Review today's reflections ----------
+if not today_df.empty:
+    with st.expander("🕯 Review today's reflections"):
+        st.dataframe(today_df)
+
+        # Optional day summary for today
+        counts = today_df.groupby(["Scale", "Feeling"]).size().unstack(fill_value=0)
+        for col in ["Good", "Bad"]:
+            if col not in counts.columns:
+                counts[col] = 0
+        st.write("### 💭 Today’s Summary")
+
+        summary = []
+        for scale in ["Engagement", "Energy", "Joy", "Purpose"]:
+            good = counts.loc[scale, "Good"] if scale in counts.index else 0
+            bad = counts.loc[scale, "Bad"] if scale in counts.index else 0
+            if good > bad:
+                summary.append(f"more *good* {scale.lower()} than bad {scale.lower()}")
+            elif bad > good:
+                summary.append(f"more *bad* {scale.lower()} than good {scale.lower()}")
+            else:
+                summary.append(f"balanced {scale.lower()}")
+        summary_text = ", ".join(summary[:-1]) + f", and {summary[-1]}."
+        st.markdown(f"> So far today, you’ve felt {summary_text}.")
 
 # ---------- Past Days Section ----------
 st.write("### 📅 Past Days Archive")
